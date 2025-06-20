@@ -31,9 +31,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: passwordController.text.trim(),
       );
       if (!mounted) return;
+      
+      // Navegar a la pantalla de inicio después del registro exitoso
+      Navigator.pushReplacementNamed(context, '/inicio');
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("¡Registro exitoso!")));
-      Navigator.pop(context); // Regresa al login
+        const SnackBar(content: Text("¡Registro exitoso! Bienvenido")));
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,8 +66,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
+      
+      // Navegar a la pantalla de inicio después del registro con Google exitoso
+      Navigator.pushReplacementNamed(context, '/inicio');
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("¡Registro con Google exitoso!")));
+        const SnackBar(content: Text("¡Registro con Google exitoso! Bienvenido")));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -132,6 +139,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: nameController,
                     decoration: _inputDecoration('Nombre Completo', 'Tu nombre y apellido'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese su nombre completo';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -141,6 +154,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Ingrese su correo';
                       }
+                      if (!value.contains('@')) {
+                        return 'Ingrese un correo válido';
+                      }
                       return null;
                     },
                   ),
@@ -148,11 +164,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: phoneController,
                     decoration: _inputDecoration('Número de Teléfono', '+123 456 789'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese su número de teléfono';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: birthController,
                     decoration: _inputDecoration('Fecha de Nacimiento', 'DD / MM / YYYY'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese su fecha de nacimiento';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -174,7 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return 'Ingrese su contraseña';
                       }
                       if (value.length < 6) {
-                        return 'Contraseña muy corta';
+                        return 'La contraseña debe tener al menos 6 caracteres';
                       }
                       return null;
                     },
@@ -195,6 +223,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Confirme su contraseña';
+                      }
                       if (value != passwordController.text) {
                         return 'Las contraseñas no coinciden';
                       }
@@ -218,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text("Iniciar Sesión"),
+                          : const Text("Crear Cuenta"),
                     ),
                   ),
                   const SizedBox(height: 11),
@@ -231,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 28,
                       ),
                       label: const Text(
-                        "Iniciar sesión con Google",
+                        "Registrarse con Google",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -252,7 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text("¿Ya tienes una cuenta? "),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushReplacementNamed(context, '/login');
                         },
                         child: const Text(
                           "Iniciar Sesión",

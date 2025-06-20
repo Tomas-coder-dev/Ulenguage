@@ -7,6 +7,7 @@ import 'animation/welcome_screen.dart';
 import 'login/register/login_screen.dart';
 import 'login/register/register_screen.dart';
 import 'login/password/forgot_password_screen.dart';
+import 'inicio.dart'; // Importa el archivo inicio.dart
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ void main() async {
         projectId: "ulenguage",
         storageBucket: "ulenguage.appspot.com",
         messagingSenderId: "250811921383",
-        appId: "1:250811921383:web:98bf58c7b2f785d5028342", // Usa el appId de la web si lo tienes, este puede funcionar
+        appId: "1:250811921383:web:98bf58c7b2f785d5028342",
         // measurementId: "G-XXXXXXXXXX", // (opcional para Analytics)
       ),
     );
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/forgot': (context) => const ForgotPasswordScreen(),
+        '/inicio': (context) => const InicioScreen(), // Nueva ruta para inicio
       },
     );
   }

@@ -24,6 +24,10 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
       if (!mounted) return;
+      
+      // Navegar a la pantalla de inicio después del login exitoso
+      Navigator.pushReplacementNamed(context, '/inicio');
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("¡Bienvenido!")));
     } on FirebaseAuthException catch (e) {
@@ -55,6 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
+      
+      // Navegar a la pantalla de inicio después del login con Google exitoso
+      Navigator.pushReplacementNamed(context, '/inicio');
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Sesión iniciada con Google")));
     } catch (e) {
