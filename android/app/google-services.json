@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "250811921383",
+    "project_id": "ulenguage",
+    "storage_bucket": "ulenguage.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250811921383:android:98bf58c7b2f785d5028342",
+        "android_client_info": {
+          "package_name": "ulenguage.tesis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzWrjT8pxL_yRjfURIaazi3SqBElc_oIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
