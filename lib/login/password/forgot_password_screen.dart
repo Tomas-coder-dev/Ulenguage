@@ -37,32 +37,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Container(
-            width: 380,
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
+            width: 400,
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 38),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(36),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha((0.04 * 255).toInt()),
-                  blurRadius: 12,
+                  color: Colors.black.withAlpha((0.08 * 255).toInt()),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(24),
                   child: Image.network(
-                    'https://github.com/Tomas-coder-dev/Ulenguage/raw/main/LOGOTIPO%202.0.png',
-                    height: 72,
+                    'https://res.cloudinary.com/dd5phul5v/image/upload/v1750397736/LOGOTIPO_2.0_xhl3l4.png',
+                    height: 85,
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 const Text(
                   '¿Haz Olvidado Tu Contraseña?',
                   style: TextStyle(
@@ -86,7 +86,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(22),
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -102,7 +102,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(24),
                       ),
                       elevation: 0,
                     ),

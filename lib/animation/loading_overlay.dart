@@ -12,10 +12,17 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         child,
         if (isLoading)
-          Container(
-            color: Colors.black.withAlpha((0.4 * 255).toInt()), // Cambiado por .withAlpha
-            child: const Center(
-              child: CircularProgressIndicator(),
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: isLoading ? 1 : 0,
+            child: Container(
+              color: const Color(0xFF000000).withValues(alpha: 0.32),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD72631)),
+                ),
+              ),
             ),
           ),
       ],
