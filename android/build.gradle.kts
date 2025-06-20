@@ -1,7 +1,8 @@
-plugins {
-    // ...otros plugins que ya tengas
+// android/build.gradle.kts (nivel de proyecto)
+import org.gradle.api.tasks.Delete
 
-    // Agrega el plugin de Google Services a nivel de proyecto, pero no lo aplica aquí
+plugins {
+    // Otros plugins ya configurados…
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
@@ -12,14 +13,13 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// (Opcional) Unifica la carpeta de build para todos los submódulos
+val rootBuildDir = rootProject.layout.buildDirectory.dir("../../build").get()
+rootProject.layout.buildDirectory.value(rootBuildDir)
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
+    val subBuildDir = rootBuildDir.dir(project.name)
+    project.layout.buildDirectory.value(subBuildDir)
     project.evaluationDependsOn(":app")
 }
 
