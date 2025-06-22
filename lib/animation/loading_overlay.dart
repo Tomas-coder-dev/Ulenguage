@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
+// Paleta UIX
+const Color kBrandRed = Color(0xFFD72631);
+const Color kOverlayBg = Color(0xFF23272E); // Gris oscuro para overlay
+
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
   final Widget child;
 
-  const LoadingOverlay({super.key, required this.isLoading, required this.child});
+  const LoadingOverlay({
+    super.key,
+    required this.isLoading,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +21,39 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 250),
             opacity: isLoading ? 1 : 0,
-            child: Container(
-              color: const Color(0xFF000000).withValues(alpha: 0.32),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD72631)),
+            curve: Curves.easeInOut,
+            child: AbsorbPointer(
+              absorbing: true,
+              child: Container(
+                // Overlay gris oscuro semi-transparente, elegante y profesional
+                color: kOverlayBg.withValues(alpha: 0.22),
+                child: const Center(
+                  child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x19000000),
+                            blurRadius: 14,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: AlwaysStoppedAnimation<Color>(kBrandRed),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

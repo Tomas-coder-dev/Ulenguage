@@ -1,55 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'firebase_options.dart'; // <- este archivo debe estar en /lib
 
-import 'animation/splash_screen.dart';
-import 'animation/welcome_screen.dart';
-import 'login/register/login_screen.dart';
-import 'login/register/register_screen.dart';
-import 'login/password/forgot_password_screen.dart';
-import 'inicio.dart'; // Importa el archivo inicio.dart
+import 'login/login_screen.dart' as login;
+import 'register/register_screen.dart' as register;
+import 'Inicio/inicio_screen_andino.dart';
+import 'perfil/perfil_screen_andino.dart';
+import 'Explorar/explorar_screen_andino.dart';
+import 'Traduccion/traducir_screen_andino.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyBzWrjT8pxL_yRjfURIaazi3SqBElc_oIY",
-        authDomain: "ulenguage.firebaseapp.com",
-        projectId: "ulenguage",
-        storageBucket: "ulenguage.appspot.com",
-        messagingSenderId: "250811921383",
-        appId: "1:250811921383:web:98bf58c7b2f785d5028342",
-        // measurementId: "G-XXXXXXXXXX", // (opcional para Analytics)
-      ),
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
-  runApp(const MyApp());
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // ¡Esto arregla tu error!
+  );
+  runApp(const AndinaApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AndinaApp extends StatelessWidget {
+  const AndinaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ulenguage',
       debugShowCheckedModeBanner: false,
+      title: 'Andina',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD72631)),
+        brightness: Brightness.light,
+        fontFamily: 'SF Pro Display',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFD72631),
+          primary: const Color(0xFFD72631),
+          surface: const Color(
+            0xFFF7F7FA,
+          ), // ¡Usa 'surface' en vez de 'background'!
+        ),
         useMaterial3: true,
-        fontFamily: 'Montserrat',
       ),
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
-        '/': (context) => const SplashScreen(),
-        '/welcome': (context) => const WelcomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/forgot': (context) => const ForgotPasswordScreen(),
-        '/inicio': (context) => const InicioScreen(), // Nueva ruta para inicio
+        '/login': (_) => const login.LoginScreen(),
+        '/register': (_) => const register.RegisterScreen(),
+        '/inicio': (_) => const InicioScreen(),
+        '/perfil': (_) => const PerfilScreen(),
+        '/explorar': (_) => const ExplorarScreen(),
+        '/traducir': (_) => const TraducirScreen(),
       },
     );
   }
