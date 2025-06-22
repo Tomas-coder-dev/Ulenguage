@@ -1,16 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-// PALETA DE COLORES SEGÚN IDENTIDAD Y GUÍA UI/UX
-const Color kBrandRed = Color(0xFFD72631);
-const Color kBg = Color(0xFFF7F7FA); // Fondo muy claro
-const Color kCard = Color(0xFFFFFFFF); // Tarjeta blanco puro
-const Color kTextPrimary = Color(0xFF23272E); // Gris oscuro
-const Color kTextSecondary = Color(0xFF75787D); // Gris medio
-const Color kBorder = Color(0xFFECECEC); // Bordes sutiles
-const Color kShadow = Color(0x141A1A1A); // Sombra sutil
+// PALETA
+const Color kRed = Color(0xFFEF233C);
+const Color kBg = Color(0xFFF6F6F9);
+const Color kCard = Color(0xFFFFFFFF);
+const Color kText = Color(0xFF212529);
+const Color kText2 = Color(0xFF868E96);
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,17 +19,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController birthController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
   bool isLoading = false;
   bool obscurePassword = true;
-  bool obscureConfirmPassword = true;
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -41,17 +35,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: passwordController.text.trim(),
       );
       if (!mounted) return;
-
       Navigator.pushReplacementNamed(context, '/inicio');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("¡Registro exitoso! Bienvenido")),
-      );
+      _showSnackBar("¡Registro exitoso! Bienvenido");
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Error al registrar')),
-      );
+      _showSnackBar(e.message ?? 'Error al registrar');
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -77,326 +65,277 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
-
       Navigator.pushReplacementNamed(context, '/inicio');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("¡Registro con Google exitoso! Bienvenido"),
-        ),
-      );
+      _showSnackBar("¡Registro con Google exitoso! Bienvenido");
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error con Google: $e")));
+      _showSnackBar("Error con Google: $e");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  InputDecoration _inputDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      labelStyle: const TextStyle(
-        color: kTextSecondary,
-        fontFamily: 'SF Pro Display',
+  void _showSnackBar(String msg) {
+    final overlay = Overlay.of(context, rootOverlay: true);
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 48,
+        left: 30,
+        right: 30,
+        child: CupertinoPopupSurface(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            decoration: BoxDecoration(
+              color: kCard,
+              borderRadius: BorderRadius.circular(13),
+              boxShadow: [
+                BoxShadow(
+                  color: kRed.withOpacity(0.07),
+                  blurRadius: 9,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                msg,
+                style: const TextStyle(
+                  color: kRed,
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      hintStyle: const TextStyle(
-        color: kTextSecondary,
-        fontFamily: 'SF Pro Display',
+    );
+    overlay.insert(entry);
+    Future.delayed(const Duration(seconds: 2), entry.remove);
+  }
+
+  Widget _inputField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+    bool obscure = false,
+    VoidCallback? toggle,
+    TextInputType? keyboardType,
+  }) {
+    return CupertinoTextField(
+      controller: controller,
+      keyboardType: keyboardType ?? TextInputType.text,
+      obscureText: isPassword ? obscure : false,
+      style: const TextStyle(color: kText, fontFamily: 'SF Pro Display'),
+      placeholder: hint,
+      prefix: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Icon(icon, color: kText2, size: 22),
       ),
-      filled: true,
-      fillColor: kBg,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide.none,
+      suffix: isPassword
+          ? CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              onPressed: toggle,
+              child: Icon(
+                obscure ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+                color: kText2,
+              ),
+            )
+          : null,
+      placeholderStyle: const TextStyle(color: kText2),
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(16),
       ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return CupertinoPageScaffold(
       backgroundColor: kBg,
-      body: Center(
+      child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-          child: Container(
-            width: 400,
-            constraints: const BoxConstraints(maxWidth: 400),
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 38),
-            decoration: BoxDecoration(
-              color: kCard,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: const [
-                BoxShadow(color: kShadow, blurRadius: 18, offset: Offset(0, 6)),
-              ],
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Logo
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      'https://res.cloudinary.com/dd5phul5v/image/upload/v1750397736/LOGOTIPO_2.0_xhl3l4.png',
-                      height: 75,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    "Crear una cuenta",
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  const Text(
-                    "Completa tus datos para comenzar a aprender",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: kTextSecondary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  TextFormField(
-                    controller: nameController,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration(
-                      'Nombre completo',
-                      'Tu nombre y apellido',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingrese su nombre completo';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration(
-                      'Correo electrónico',
-                      'example@email.com',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingrese su correo';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Ingrese un correo válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration(
-                      'Número de teléfono',
-                      '+123 456 789',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingrese su número de teléfono';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: birthController,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration(
-                      'Fecha de nacimiento',
-                      'DD / MM / YYYY',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingrese su fecha de nacimiento';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: obscurePassword,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration('Contraseña', '').copyWith(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: kTextSecondary,
-                        ),
-                        onPressed: () {
-                          setState(() => obscurePassword = !obscurePassword);
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingrese su contraseña';
-                      }
-                      if (value.length < 6) {
-                        return 'La contraseña debe tener al menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: confirmPasswordController,
-                    obscureText: obscureConfirmPassword,
-                    style: const TextStyle(
-                      color: kTextPrimary,
-                      fontFamily: 'SF Pro Display',
-                    ),
-                    decoration: _inputDecoration('Confirmar contraseña', '')
-                        .copyWith(
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              obscureConfirmPassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: kTextSecondary,
-                            ),
-                            onPressed: () {
-                              setState(
-                                () => obscureConfirmPassword =
-                                    !obscureConfirmPassword,
-                              );
-                            },
+          child: Column(
+            children: [
+              const SizedBox(height: 45),
+              // Logo y título
+              Container(
+                margin: const EdgeInsets.only(bottom: 32),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: kCard,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 12,
                           ),
-                        ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Confirme su contraseña';
-                      }
-                      if (value != passwordController.text) {
-                        return 'Las contraseñas no coinciden';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kBrandRed,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          fontFamily: 'SF Pro Display',
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        elevation: 0,
+                        ],
                       ),
-                      child: isLoading
-                          ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.6,
-                              ),
-                            )
-                          : const Text("Crear cuenta"),
-                    ),
-                  ),
-                  const SizedBox(height: 13),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: isLoading ? null : _registerWithGoogle,
-                      icon: Image.network(
-                        'https://img.icons8.com/?size=100&id=YpTJTJYKapL1&format=png&color=000000',
-                        height: 22,
-                      ),
-                      label: const Text(
-                        "Registrarse con Google",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'SF Pro Display',
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: kTextPrimary,
-                        side: const BorderSide(color: kBrandRed, width: 2),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        textStyle: const TextStyle(fontSize: 17),
+                      padding: const EdgeInsets.all(16),
+                      child: Image.network(
+                        'https://res.cloudinary.com/dd5phul5v/image/upload/v1750397736/LOGOTIPO_2.0_xhl3l4.png',
+                        height: 54,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(height: 14),
+                    const Text(
+                      "Crea tu cuenta",
+                      style: TextStyle(
+                        color: kText,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SF Pro Display',
+                        fontSize: 22,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 30,
+                ),
+                decoration: BoxDecoration(
+                  color: kCard,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
                     children: [
-                      const Text(
-                        "¿Ya tienes una cuenta?",
-                        style: TextStyle(
-                          color: kTextSecondary,
-                          fontFamily: 'SF Pro Display',
+                      _inputField(
+                        controller: nameController,
+                        hint: "Nombre completo",
+                        icon: CupertinoIcons.person,
+                        keyboardType: TextInputType.name,
+                      ),
+                      const SizedBox(height: 12),
+                      _inputField(
+                        controller: emailController,
+                        hint: "Correo electrónico",
+                        icon: CupertinoIcons.mail,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 12),
+                      _inputField(
+                        controller: phoneController,
+                        hint: "Teléfono",
+                        icon: CupertinoIcons.phone,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 12),
+                      _inputField(
+                        controller: passwordController,
+                        hint: "Contraseña",
+                        icon: CupertinoIcons.lock,
+                        isPassword: true,
+                        obscure: obscurePassword,
+                        toggle: () =>
+                            setState(() => obscurePassword = !obscurePassword),
+                      ),
+                      const SizedBox(height: 17),
+                      SizedBox(
+                        width: double.infinity,
+                        child: CupertinoButton(
+                          borderRadius: BorderRadius.circular(16),
+                          color: kRed,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          onPressed: isLoading ? null : _register,
+                          child: isLoading
+                              ? const CupertinoActivityIndicator(
+                                  color: CupertinoColors.white,
+                                )
+                              : const Text(
+                                  "Crear cuenta",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    fontFamily: 'SF Pro Display',
+                                  ),
+                                ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/login');
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: kBrandRed,
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'SF Pro Display',
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: CupertinoButton(
+                          borderRadius: BorderRadius.circular(16),
+                          color: kCard,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          onPressed: isLoading ? null : _registerWithGoogle,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.network(
+                                'https://img.icons8.com/?size=100&id=YpTJTJYKapL1&format=png&color=000000',
+                                height: 22,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                "Registrarse con Google",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: kText,
+                                  fontFamily: 'SF Pro Display',
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: const Text("Iniciar sesión"),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "¿Ya tienes una cuenta?",
+                            style: TextStyle(
+                              color: kText2,
+                              fontFamily: 'SF Pro Display',
+                              fontSize: 15,
+                            ),
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(context, '/login');
+                            },
+                            child: const Text(
+                              "Iniciar sesión",
+                              style: TextStyle(
+                                color: kRed,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'SF Pro Display',
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
